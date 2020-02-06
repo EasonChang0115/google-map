@@ -73,13 +73,11 @@ $information-width: 320px;
   box-shadow: 0px 0px 5px rgba(black, 0.2);
   transition: .3s;
   &.active {
-    .information-panel {
-      width: $information-width;
-    }
+    left: -320px;
   }
 }
 .information-panel {
-  width: 0;
+  width: $information-width;
   height: 100vh;
   padding: 16px 0;
   transition: .3s;

@@ -326,7 +326,10 @@ export default {
         this.makers.forEach(function(e) {
           e.setMap(null);
         });
-        if (this.markerCluster) this.markerCluster.setMap(null);
+        if (this.markerCluster) {
+          this.markerCluster.setMap(null);
+          this.markerCluster.clearMarkers();
+        }
         this.makers = [];
         this.putStorePosition();
       }
