@@ -1,7 +1,17 @@
 <template>
   <div class="side-panel" :class="{ active: active }">
     <div class="information-panel">
+       <div class="form-group">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" class="custom-control-input" id="customSwitch1" @change="onCheckbox">
+          <label class="custom-control-label" for="customSwitch1">使用目前位置</label>
+        </div>
+      </div>
       <CityAddress @onChangeAddress="onChangeAddress" />
+      <div>附近或區域內總共有 {{ pharmacy.length }} 家藥局。</div>
+      <div class="card-list">
+        <PharmacyCard v-for="(item, index) in pharmacy" :key="index" :item="item" @onclick="cardClick" />
+      </div>
     </div>
     <div class="control-panel">
       <ul class="icon-list">
@@ -14,9 +24,12 @@
 
 <script>
 import CityAddress from './CityAddress.vue';
+import PharmacyCard from './PharmacyCard.vue';
 export default {
+  props: ['pharmacy'],
   components: {
-    CityAddress
+    CityAddress,
+    PharmacyCard
   },
   data() {
     return {
@@ -55,6 +68,12 @@ export default {
     },
     onChangeAddress(value) {
       this.addressObject = value;
+    },
+    cardClick(pharmacyGeometry) {
+      console.log(pharmacyGeometry);
+    },
+    onCheckbox(e) {
+      this.$emit('onIsDevice', e.target.checked);
     }
   }
 };
@@ -66,17 +85,19 @@ $information-width: 320px;
 .side-panel {
   position: fixed;
   display: flex;
-  left: 0;
+  left: -320px;
   height: 100vh;
   z-index: 100;
   background-color: #fff;
   box-shadow: 0px 0px 5px rgba(black, 0.2);
   transition: .3s;
   &.active {
-    left: -320px;
+    left: 0px;
   }
 }
 .information-panel {
+  display: flex;
+  flex-direction: column;
   width: $information-width;
   height: 100vh;
   padding: 16px 0;
@@ -107,5 +128,8 @@ $information-width: 320px;
       }
     }
   }
+}
+.card-list {
+  overflow: scroll;
 }
 </style>

@@ -3,21 +3,22 @@
 </template>
 
 <script>
+import mapStyle from '@/assets/mapStyle.json';
 export default {
   props: {
+    address: {
+      type: String
+    },
+    isDevicePosition: {
+      type: Boolean,
+      default: function () {
+        return false;
+      }
+    },
     pharmacy: {
       type: Array,
       default: function() {
         return [];
-      }
-    },
-    devicePosition: {
-      type: Object,
-      default: function() {
-        return {
-          lat: 25.0325917,
-          lng: 121.5624999
-        };
       }
     }
   },
@@ -30,293 +31,26 @@ export default {
       makers: [],
       nightMode: 'close', // 夜間模式：open開啟
       // 夜間模式的styles，資料來源：https://developers.google.com/maps/documentation/javascript/styling?hl=zh-tw
-      nightModeStyles: [
-        {
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#1d2c4d'
-            }
-          ]
-        },
-        {
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#8ec3b9'
-            }
-          ]
-        },
-        {
-          elementType: 'labels.text.stroke',
-          stylers: [
-            {
-              color: '#1a3646'
-            }
-          ]
-        },
-        {
-          featureType: 'administrative.country',
-          elementType: 'geometry.stroke',
-          stylers: [
-            {
-              color: '#4b6878'
-            }
-          ]
-        },
-        {
-          featureType: 'administrative.land_parcel',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#64779e'
-            }
-          ]
-        },
-        {
-          featureType: 'administrative.province',
-          elementType: 'geometry.stroke',
-          stylers: [
-            {
-              color: '#4b6878'
-            }
-          ]
-        },
-        {
-          featureType: 'landscape.man_made',
-          elementType: 'geometry.stroke',
-          stylers: [
-            {
-              color: '#334e87'
-            }
-          ]
-        },
-        {
-          featureType: 'landscape.natural',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#023e58'
-            }
-          ]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#283d6a'
-            }
-          ]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#6f9ba5'
-            }
-          ]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'labels.text.stroke',
-          stylers: [
-            {
-              color: '#1d2c4d'
-            }
-          ]
-        },
-        {
-          featureType: 'poi.business',
-          stylers: [
-            {
-              visibility: 'off'
-            }
-          ]
-        },
-        {
-          featureType: 'poi.park',
-          elementType: 'geometry.fill',
-          stylers: [
-            {
-              color: '#023e58'
-            }
-          ]
-        },
-        {
-          featureType: 'poi.park',
-          elementType: 'labels.text',
-          stylers: [
-            {
-              visibility: 'off'
-            }
-          ]
-        },
-        {
-          featureType: 'poi.park',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#3C7680'
-            }
-          ]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#304a7d'
-            }
-          ]
-        },
-        {
-          featureType: 'road',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#98a5be'
-            }
-          ]
-        },
-        {
-          featureType: 'road',
-          elementType: 'labels.text.stroke',
-          stylers: [
-            {
-              color: '#1d2c4d'
-            }
-          ]
-        },
-        {
-          featureType: 'road.arterial',
-          elementType: 'labels',
-          stylers: [
-            {
-              visibility: 'off'
-            }
-          ]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#2c6675'
-            }
-          ]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry.stroke',
-          stylers: [
-            {
-              color: '#255763'
-            }
-          ]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'labels',
-          stylers: [
-            {
-              visibility: 'off'
-            }
-          ]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#b0d5ce'
-            }
-          ]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'labels.text.stroke',
-          stylers: [
-            {
-              color: '#023e58'
-            }
-          ]
-        },
-        {
-          featureType: 'road.local',
-          stylers: [
-            {
-              visibility: 'off'
-            }
-          ]
-        },
-        {
-          featureType: 'transit',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#98a5be'
-            }
-          ]
-        },
-        {
-          featureType: 'transit',
-          elementType: 'labels.text.stroke',
-          stylers: [
-            {
-              color: '#1d2c4d'
-            }
-          ]
-        },
-        {
-          featureType: 'transit.line',
-          elementType: 'geometry.fill',
-          stylers: [
-            {
-              color: '#283d6a'
-            }
-          ]
-        },
-        {
-          featureType: 'transit.station',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#3a4762'
-            }
-          ]
-        },
-        {
-          featureType: 'water',
-          elementType: 'geometry',
-          stylers: [
-            {
-              color: '#0e1626'
-            }
-          ]
-        },
-        {
-          featureType: 'water',
-          elementType: 'labels.text.fill',
-          stylers: [
-            {
-              color: '#4e6d70'
-            }
-          ]
-        }
-      ]
+      nightModeStyles: mapStyle
     };
   },
   mounted() {
     this.initMap();
+    this.moveToLocationByAddress(this.address);
   },
   watch: {
-    devicePosition: {
+    isDevicePosition: {
+      immediate: true,
+      handler: function(value) {
+        if (value) this.getDevicePosition();
+        else this.moveToLocationByAddress(this.address);
+      }
+    },
+    address: {
       immediate: false,
       deep: true,
       handler: function(value) {
-        this.moveToLocation(value);
+        this.moveToLocationByAddress(value);
       }
     },
     pharmacy: {
@@ -342,7 +76,7 @@ export default {
       this.map = new window.google.maps.Map(document.getElementById('map'), {
         disableDefaultUI: true,
         // 設定地圖的中心點經緯度位置
-        center: { lat: this.devicePosition.lat, lng: this.devicePosition.lng },
+        center: { lat: 0, lng: 0 },
         // 設定地圖縮放比例 0-20
         zoom: 15,
         // 限制使用者能縮放地圖的最大比例
@@ -357,13 +91,31 @@ export default {
       });
       this.centerMarker = new window.google.maps.Marker({
         position: {
-          lat: this.devicePosition.lat,
-          lng: this.devicePosition.lng
+          lat: 0,
+          lng: 0
         },
+        icon: './people.png',
+        animation: window.google.maps.Animation.DROP,
         map: this.map
       });
     },
-    moveToLocation({ lat, lng }) {
+    moveToLocationByAddress(address) {
+      if (this.isDevicePosition) return;
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK') {
+          this.map.panTo(results[0].geometry.location);
+          this.centerMarker.setPosition(results[0].geometry.location);
+        } else {
+          console.log(status);
+        }
+      });
+      // const center = new window.google.maps.LatLng(lat, lng);
+      // this.centerMarker.setPosition(center);
+      // this.map.panTo(center);
+    },
+    moveToLocationByLatlang({ lat, lng }) {
+      if (!this.isDevicePosition) return;
       const center = new window.google.maps.LatLng(lat, lng);
       this.centerMarker.setPosition(center);
       this.map.panTo(center);
@@ -390,6 +142,7 @@ export default {
       const marker = new window.google.maps.Marker({
         position: latLng,
         map: this.map,
+        icon: './med-stores_geojson.png',
         data: store.properties
       });
       // 透過 InfoWindow 物件建構子建立新訊息視窗
@@ -407,6 +160,16 @@ export default {
         this.currentInfoWindow = infowindow;
       });
       return marker;
+    },
+    async getDevicePosition () {
+      // 獲取當下裝置的位置
+      const position = await this.getCoordinates();
+      this.moveToLocationByLatlang({ lat: position.coords.latitude, lng: position.coords.longitude });
+    },
+    getCoordinates() {
+      return new Promise(function(resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
     }
   }
 };

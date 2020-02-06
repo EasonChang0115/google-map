@@ -1,8 +1,8 @@
 <template>
   <div id="app" class="container-fluid">
     <div class="row">
-      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy"/>
-      <GoogleMap :pharmacy="filterPharmacy" :devicePosition="devicePosition" />
+      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition"/>
+      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition"/>
     </div>
    </div>
 </template>
@@ -20,10 +20,7 @@ export default {
     return {
       pharmacy: [],
       filterPharmacy: [],
-      devicePosition: {
-        lat: 25.0325917,
-        lng: 121.5624999
-      },
+      isDevicePosition: false,
       addressInformtion: {
         city: '台北市',
         country: 'all',
@@ -33,7 +30,11 @@ export default {
   },
   mounted() {
     this.getStoreGeoPosition();
-    this.getPosition();
+  },
+  computed: {
+    addressString () {
+      return `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}${this.addressInformtion.address.trim()}`;
+    }
   },
   methods: {
     getStoreGeoPosition() {
@@ -47,21 +48,18 @@ export default {
           this.onChangePharmacy();
       });
     },
-    async getPosition () {
-      // 獲取當下裝置的位置
-      const position = await this.getCoordinates();
-      this.devicePosition.lat = position.coords.latitude;
-      this.devicePosition.lng = position.coords.longitude;
-    },
-    getCoordinates() {
-      return new Promise(function(resolve, reject) {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
-    },
     onChangePharmacy(addressInformtion) {
       if (addressInformtion) this.addressInformtion = addressInformtion;
-      const addressString = `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}${this.addressInformtion.address.trim()}`;
-      this.filterPharmacy = this.pharmacy.filter((item) => item.properties.address.includes(addressString));
+      const filterPharmacyByAddress = this.pharmacy.filter((item) => item.properties.address.includes(this.addressString));
+      const filterPharmacyByName = this.pharmacy.filter((item) => item.properties.name === this.addressInformtion.address);
+      if (filterPharmacyByName.length > 0) {
+        this.filterPharmacy = filterPharmacyByName;
+      } else {
+        this.filterPharmacy = filterPharmacyByAddress;
+      }
+    },
+    onChangeIsDevicePosition(value) {
+      this.isDevicePosition = value;
     }
   }
 };
