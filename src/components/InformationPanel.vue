@@ -1,6 +1,8 @@
 <template>
   <div class="side-panel" :class="{ active: active }">
-    <div class="information-panel"></div>
+    <div class="information-panel">
+      <CityAddress @onChangeAddress="onChangeAddress" />
+    </div>
     <div class="control-panel">
       <ul class="icon-list">
         <li :class="closeBtnClass" :style="{ backgroundColor: '#3498DB' }" @click="active = !active"></li>
@@ -11,7 +13,11 @@
 </template>
 
 <script>
+import CityAddress from './CityAddress.vue';
 export default {
+  components: {
+    CityAddress
+  },
   data() {
     return {
       iconList: [
@@ -21,8 +27,22 @@ export default {
           color: '#82c91e'
         }
       ],
-      active: true
+      active: true,
+      addressObject: {
+        city: '台北市',
+        country: 'all',
+        address: ''
+      }
     };
+  },
+  watch: {
+    addressObject: {
+      deep: true,
+      immediate: false,
+      handler: function(value) {
+        this.$emit('onChangePharmacy', value);
+      }
+    }
   },
   computed: {
     closeBtnClass() {
@@ -32,6 +52,9 @@ export default {
   methods: {
     changeInformationPanel() {
       this.active = true;
+    },
+    onChangeAddress(value) {
+      this.addressObject = value;
     }
   }
 };
@@ -39,7 +62,7 @@ export default {
 
 <style lang="scss" scoped>
 $control-width: 50px;
-$information-width: 270px;
+$information-width: 320px;
 .side-panel {
   position: fixed;
   display: flex;
@@ -58,6 +81,7 @@ $information-width: 270px;
 .information-panel {
   width: 0;
   height: 100vh;
+  padding: 16px 0;
   transition: .3s;
   transition-delay: .1s;
 }

@@ -26,6 +26,7 @@ export default {
       map: null,
       centerMaker: null,
       currentInfoWindow: null,
+      markerCluster: null,
       makers: [],
       nightMode: 'close', // 夜間模式：open開啟
       // 夜間模式的styles，資料來源：https://developers.google.com/maps/documentation/javascript/styling?hl=zh-tw
@@ -309,7 +310,6 @@ export default {
   },
   mounted() {
     this.initMap();
-    this.putStorePosition();
   },
   watch: {
     devicePosition: {
@@ -317,6 +317,18 @@ export default {
       deep: true,
       handler: function(value) {
         this.moveToLocation(value);
+      }
+    },
+    pharmacy: {
+      deep: true,
+      immediate: false,
+      handler: function (value) {
+        this.makers.forEach(function(e) {
+          e.setMap(null);
+        });
+        if (this.markerCluster) this.markerCluster.setMap(null);
+        this.makers = [];
+        this.putStorePosition();
       }
     }
   },
@@ -358,8 +370,7 @@ export default {
       this.pharmacy.forEach((store, index) => {
         this.makers.push(this.setMarker(store));
       });
-      // eslint-disable-next-line no-unused-vars
-      const markerCluster = new window.MarkerClusterer(this.map, this.makers, {
+      this.markerCluster = new window.MarkerClusterer(this.map, this.makers, {
         gridSize: 50,
         maxZoom: 15,
         zoomOnClick: true,
