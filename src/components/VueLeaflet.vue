@@ -1,10 +1,25 @@
 <template>
-  <div id="map" class="embed-responsive embed-responsive-16by9 google-map"></div>
+  <div class="vue-leaflet">
+    <l-map style="width: 100%; height: 100%;" :zoom="zoom" :center="center">
+      <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+      <l-marker :lat-lng="centerMaker" :icon="peopleMarkerIcon">
+        <l-popup :content="text"></l-popup>
+      </l-marker>
+        <l-marker v-for="item in pharmacy" :icon="storeMarkerIcon" :key="item.properties.id" :lat-lng="transLatLng(item.geometry)">
+          <l-popup :content="item.properties.name"></l-popup>
+        </l-marker>
+    </l-map>
+  </div>
 </template>
 
 <script>
-import mapStyle from '@/assets/mapStyle.json';
+import { LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+// import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster';
+const provider = new OpenStreetMapProvider();
+
 export default {
+  name: 'VueLeaflet',
   props: {
     makerID: {
       type: String || Number
@@ -25,18 +40,34 @@ export default {
       }
     }
   },
-  data() {
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup
+    // Vue2LeafletMarkerCluster
+  },
+  data () {
     return {
-      map: null,
-      centerMaker: null,
+      zoom: 13,
+      center: window.L.latLng(47.413220, -1.219482),
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      text: '我在這裡',
+      centerMaker: window.L.latLng(47.413220, -1.219482),
       currentInfoWindow: null,
       markerCluster: null,
       makers: [],
-      nightModeStyles: mapStyle
+      peopleMarkerIcon: window.L.icon({
+        iconUrl: require('../assets/people.png'),
+        store: require('../assets/med-stores_geojson.png')
+      }),
+      storeMarkerIcon: window.L.icon({
+        iconUrl: require('../assets/med-stores_geojson.png')
+      })
     };
   },
   mounted() {
-    this.initMap();
     this.moveToLocationByAddress(this.address);
   },
   watch: {
@@ -66,67 +97,17 @@ export default {
       handler: function(value) {
         this.moveToLocationByAddress(value);
       }
-    },
-    pharmacy: {
-      deep: true,
-      immediate: false,
-      handler: function (value) {
-        this.makers.forEach(function(e) {
-          e.setMap(null);
-        });
-        if (this.markerCluster) {
-          this.markerCluster.setMap(null);
-          this.markerCluster.clearMarkers();
-        }
-        this.makers = [];
-        this.putStorePosition();
-      }
     }
   },
   methods: {
-    // 建立地圖
-    initMap() {
-      // 透過 Map 物件建構子建立新地圖 map 物件實例，並將地圖呈現在 id 為 map 的元素中
-      this.map = new window.google.maps.Map(document.getElementById('map'), {
-        disableDefaultUI: true,
-        // 設定地圖的中心點經緯度位置
-        center: { lat: 0, lng: 0 },
-        // 設定地圖縮放比例 0-20
-        zoom: 15,
-        // 限制使用者能縮放地圖的最大比例
-        maxZoom: 20,
-        // 限制使用者能縮放地圖的最小比例
-        minZoom: 3,
-        // 設定是否呈現右下角街景小人
-        streetViewControl: false,
-        // 設定是否讓使用者可以切換地圖樣式：一般、衛星圖等
-        mapTypeControl: false,
-        styles: this.nightModeStyles
-      });
-      this.centerMarker = new window.google.maps.Marker({
-        position: {
-          lat: 0,
-          lng: 0
-        },
-        icon: './people.png',
-        animation: window.google.maps.Animation.DROP,
-        map: this.map
-      });
+    transLatLng(geometry) {
+      return window.L.latLng(geometry.coordinates[1], geometry.coordinates[0]);
     },
-    moveToLocationByAddress(address) {
+    async moveToLocationByAddress(address) {
       if (this.isDevicePosition) return;
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === 'OK') {
-          this.map.panTo(results[0].geometry.location);
-          this.centerMarker.setPosition(results[0].geometry.location);
-        } else {
-          console.log(status);
-        }
-      });
-      // const center = new window.google.maps.LatLng(lat, lng);
-      // this.centerMarker.setPosition(center);
-      // this.map.panTo(center);
+      const results = await provider.search({ query: address });
+      this.center = window.L.latLng(results[0].y, results[0].x);
+      this.centerMaker = window.L.latLng(results[0].y, results[0].x);
     },
     moveToLocationByLatlang({ lat, lng }) {
       if (!this.isDevicePosition) return;
@@ -216,9 +197,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.google-map {
+<style lang="scss" scoped>
+.vue-leaflet {
   width: 100%;
   height: 100vh;
+  z-index: 0;
 }
 </style>

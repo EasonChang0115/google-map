@@ -11,11 +11,15 @@
     "bootstrap": "^4.4.1",
     "core-js": "^3.4.4",
     "jquery": "^3.4.1",
+    "leaflet": "^1.6.0",
+    "leaflet-geosearch": "^2.7.0",
     "node-sass": "^4.13.1",
     "popper.js": "^1.16.1",
     "sass": "^1.25.0",
     "sass-loader": "^8.0.2",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue2-leaflet": "^2.4.2",
+    "vue2-leaflet-markercluster": "^3.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",

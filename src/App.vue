@@ -3,20 +3,23 @@
     <div class="row">
       <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"
        @targetPhamercy="onTargetInforPharmacy" />
-      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID"/>
+      <!-- <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID"/> -->
+      <VueLeaflet :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID" />
     </div>
     <DetailCard :phamarcy="pharmacyNow" :isOpen="isOpen" :closefunc="() => { isOpen = false; }"/>
    </div>
 </template>
 
 <script>
-import GoogleMap from './components/GoogleMap.vue';
+// import GoogleMap from './components/GoogleMap.vue';
+import VueLeaflet from './components/VueLeaflet.vue';
 import InformationPanel from './components/InformationPanel.vue';
 import DetailCard from './components/DetailCard.vue';
 
 export default {
   components: {
-    GoogleMap,
+    // GoogleMap,
+    VueLeaflet,
     InformationPanel,
     DetailCard
   },
