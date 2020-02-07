@@ -3,12 +3,12 @@
       <h4 class="title">縣市搜尋</h4>
       <div class="row">
         <div class="col">
-          <select id="inputCity" class="form-control form-control-sm" v-model="selectCity" @change="onChangeInput">
+          <select id="inputCity" class="form-control form-control-sm" v-model="selectCity" @change="onChangeInput" :disabled="isDevice">
             <option v-for="(city, index) in filterCity" :key="index" :value="city">{{ city }}</option>
           </select>
         </div>
         <div class="col">
-          <select id="inputCountry" class="form-control form-control-sm" v-model="selectCountry" @change="onChangeInput">
+          <select id="inputCountry" class="form-control form-control-sm" v-model="selectCountry" @change="onChangeInput" :disabled="isDevice">
             <option value="all">選擇鄉鎮市區</option>
             <option v-for="(item, index) in filterCountry" :key="index" :value="item">{{ item }}</option>
           </select>
@@ -24,6 +24,7 @@
 
 <script>
 export default {
+  props: ['redirectAddress', 'isDevice'],
   data() {
     return {
       cityArray: [],
@@ -31,6 +32,20 @@ export default {
       selectCountry: 'all',
       inputAddress: ''
     };
+  },
+  watch: {
+    redirectAddress(object) {
+      const value = object.address;
+      if (value.trim().length === 0) return;
+      const findcity = this.filterCity.find(city => value.includes(city));
+      if (!findcity) return;
+      const areaArray = this.cityArray.filter(city => city.city === findcity).map(item => item.district);
+      const findArea = areaArray.find(area => value.includes(area));
+      if (!findArea) return;
+      this.selectCity = findcity;
+      this.selectCountry = findArea;
+      this.onChangeInput();
+    }
   },
   async mounted() {
     this.cityArray = await this.getXML('./city.json');

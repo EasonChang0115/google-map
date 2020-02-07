@@ -7,9 +7,20 @@
           <label class="custom-control-label" for="customSwitch1">使用目前位置</label>
         </div>
       </div>
-      <CityAddress @onChangeAddress="onChangeAddress" />
-      <div>附近或區域內總共有 {{ pharmacy.length }} 家藥局。</div>
-      <div class="card-list">
+      <CityAddress @onChangeAddress="onChangeAddress" :redirectAddress="redirectAddress" :isDevice="isDevice"/>
+      <div>搜索附近或區域內總共有 {{ pharmacy.length }} 家藥局。</div>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label class="btn btn-primary  btn-sm active">
+          <input type="radio" name="options" id="option1" autocomplete="off" checked @click="() => { toggleHasMask(false) }"> 全部藥局
+        </label>
+        <label class="btn btn-primary  btn-sm">
+          <input type="radio" name="options" id="option2" autocomplete="off" @click="() => { toggleHasMask(true) }"> 還有口罩({{ hasMaskPharmacy.length }})
+        </label>
+      </div>
+      <div class="card-list" v-if="hasMaskActive">
+        <PharmacyCard v-for="(item, index) in hasMaskPharmacy" :key="index + 'has'" :item="item" @onclick="cardClick" />
+      </div>
+      <div class="card-list" v-else>
         <PharmacyCard v-for="(item, index) in pharmacy" :key="index" :item="item" @onclick="cardClick" />
       </div>
     </div>
@@ -26,13 +37,14 @@
 import CityAddress from './CityAddress.vue';
 import PharmacyCard from './PharmacyCard.vue';
 export default {
-  props: ['pharmacy'],
+  props: ['pharmacy', 'redirectAddress'],
   components: {
     CityAddress,
     PharmacyCard
   },
   data() {
     return {
+      isDevice: false,
       iconList: [
         {
           name: 'map-marker-alt',
@@ -41,6 +53,7 @@ export default {
         }
       ],
       active: true,
+      hasMaskActive: false,
       addressObject: {
         city: '台北市',
         country: 'all',
@@ -59,7 +72,10 @@ export default {
   },
   computed: {
     closeBtnClass() {
-      return this.active ? 'fas fa-external-link-alt' : 'fas fa-times';
+      return this.active ? 'fas fa-times' : 'fas fa-external-link-alt';
+    },
+    hasMaskPharmacy() {
+      return this.pharmacy.filter(item => item.properties.mask_adult > 0 || item.properties.mask_child > 0);
     }
   },
   methods: {
@@ -73,7 +89,11 @@ export default {
       console.log(pharmacyGeometry);
     },
     onCheckbox(e) {
+      this.isDevice = e.target.checked;
       this.$emit('onIsDevice', e.target.checked);
+    },
+    toggleHasMask(value) {
+      this.hasMaskActive = value;
     }
   }
 };
@@ -103,6 +123,18 @@ $information-width: 320px;
   padding: 16px 0;
   transition: .3s;
   transition-delay: .1s;
+}
+.btn-group-toggle {
+  width: 50%;
+  label {
+    font-size: 12px;
+    border-radius: 0;
+    opacity: 0.5;
+    transition: .3s;
+    &.active {
+      opacity: 1;
+    }
+  }
 }
 .control-panel {
   width: $control-width;

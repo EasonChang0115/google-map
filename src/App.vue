@@ -1,8 +1,8 @@
 <template>
   <div id="app" class="container-fluid">
     <div class="row">
-      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition"/>
-      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition"/>
+      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"/>
+      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng"/>
     </div>
    </div>
 </template>
@@ -21,6 +21,7 @@ export default {
       pharmacy: [],
       filterPharmacy: [],
       isDevicePosition: false,
+      redirectAddress: '',
       addressInformtion: {
         city: '台北市',
         country: 'all',
@@ -54,12 +55,18 @@ export default {
       const filterPharmacyByName = this.pharmacy.filter((item) => item.properties.name === this.addressInformtion.address);
       if (filterPharmacyByName.length > 0) {
         this.filterPharmacy = filterPharmacyByName;
+      } else if (filterPharmacyByAddress.length === 0 && filterPharmacyByName.length === 0) {
+        const areaString = `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}`;
+        this.filterPharmacy = this.pharmacy.filter((item) => item.properties.address.includes(areaString));
       } else {
         this.filterPharmacy = filterPharmacyByAddress;
       }
     },
     onChangeIsDevicePosition(value) {
       this.isDevicePosition = value;
+    },
+    onAddressFromLatLng(value) {
+      this.redirectAddress = value;
     }
   }
 };

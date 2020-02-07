@@ -163,12 +163,35 @@ export default {
     },
     async getDevicePosition () {
       // 獲取當下裝置的位置
-      const position = await this.getCoordinates();
-      this.moveToLocationByLatlang({ lat: position.coords.latitude, lng: position.coords.longitude });
+      try {
+        const position = await this.getCoordinates();
+        this.moveToLocationByLatlang({ lat: position.coords.latitude, lng: position.coords.longitude });
+        const address = await this.getAddressBylatlng({ lat: position.coords.latitude, lng: position.coords.longitude });
+        this.$emit('onAddress', { address });
+      } catch (error) {
+        console.log('Sorry, 你的裝置不支援地理位置功能。');
+      }
     },
     getCoordinates() {
       return new Promise(function(resolve, reject) {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        // 先確認使用者裝置能不能抓地點
+        if (navigator.geolocation) {
+          // 跟使用者拿所在位置的權限
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        } else {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject('');
+        }
+      });
+    },
+    getAddressBylatlng({ lat, lng }) {
+      return new Promise(function(resolve, reject) {
+        const urlString = `https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBnKkl6dGZWe8e4povyqsv6_hnzraiPCXU&latlng=${lat},${lng}&language=zh-TW`;
+        fetch(urlString).then(result => result.json()).then(res => {
+          resolve(res.results[0].formatted_address);
+        }).catch(e => {
+          reject(e);
+        });
       });
     }
   }
