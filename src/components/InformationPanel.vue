@@ -85,8 +85,8 @@ export default {
     onChangeAddress(value) {
       this.addressObject = value;
     },
-    cardClick(pharmacyGeometry) {
-      console.log(pharmacyGeometry);
+    cardClick(pharmacy) {
+      this.$emit('targetPhamercy', pharmacy);
     },
     onCheckbox(e) {
       this.isDevice = e.target.checked;

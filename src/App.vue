@@ -1,8 +1,9 @@
 <template>
   <div id="app" class="container-fluid">
     <div class="row">
-      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"/>
-      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng"/>
+      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"
+       @targetPhamercy="onTargetPharmacy" />
+      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy"/>
     </div>
    </div>
 </template>
@@ -67,6 +68,9 @@ export default {
     },
     onAddressFromLatLng(value) {
       this.redirectAddress = value;
+    },
+    onTargetPharmacy(target) {
+      console.log(target);
     }
   }
 };

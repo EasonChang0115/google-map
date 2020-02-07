@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     cardClick() {
-      this.$emit('onclick', { id: this.item.properties.id, geometry: this.item.geometry });
+      this.$emit('onclick', { ...this.item.properties });
     }
   }
 };

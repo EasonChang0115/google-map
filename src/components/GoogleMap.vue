@@ -158,6 +158,7 @@ export default {
         if (this.currentInfoWindow) this.currentInfoWindow.close();
         infowindow.open(this.map, marker);
         this.currentInfoWindow = infowindow;
+        this.$emit('targetPhamercy', { ...marker.data });
       });
       return marker;
     },
