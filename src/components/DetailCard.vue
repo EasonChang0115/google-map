@@ -62,7 +62,6 @@ export default {
           });
         });
       });
-      console.log(timeArray);
       return timeArray;
     }
   }
@@ -80,6 +79,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 101;
 }
 .detail-card {
   position: relative;

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
+import L from 'leaflet';
 
 import 'bootstrap'; // Import js file
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import css file

@@ -1,5 +1,5 @@
 <template>
-  <div class="container city-input">
+  <div class="container city-input mb-3">
       <h4 class="title">縣市搜尋</h4>
       <div class="row">
         <div class="col">
@@ -14,11 +14,11 @@
           </select>
         </div>
       </div>
-      <div class="form-group row mt-2">
+      <!-- <div class="form-group row mt-2">
         <div class="col-sm-12">
           <input type="text" class="form-control form-control-sm" id="colFormLabelSm" v-model="inputAddress" placeholder="街道地址或藥局名稱" @keypress.enter="onChangeInput">
         </div>
-      </div>
+      </div> -->
   </div>
 </template>
 
