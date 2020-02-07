@@ -7,8 +7,8 @@
       <strong>{{ `兒童 - ${properties['mask_child']? properties['mask_child'] + ' 個': '未取得資料'}` }}</strong>
     </div>
     <div>地址: <a :href='link' target="_blank">{{ properties['address'] }}</a></div>
-    <div>電話: {{ properties['phone'] }}</div>
-    <div>最後更新時間: {{ properties['updated'] }}</div>
+    <!-- <div>電話: {{ properties['phone'] }}</div>
+    <div>最後更新時間: {{ properties['updated'] }}</div> -->
   </div>
 </template>
 

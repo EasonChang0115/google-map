@@ -2,20 +2,23 @@
   <div id="app" class="container-fluid">
     <div class="row">
       <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"
-       @targetPhamercy="onTargetPharmacy" />
-      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy"/>
+       @targetPhamercy="onTargetInforPharmacy" />
+      <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID"/>
     </div>
+    <DetailCard :phamarcy="pharmacyNow" :isOpen="isOpen" :closefunc="() => { isOpen = false; }"/>
    </div>
 </template>
 
 <script>
 import GoogleMap from './components/GoogleMap.vue';
 import InformationPanel from './components/InformationPanel.vue';
+import DetailCard from './components/DetailCard.vue';
 
 export default {
   components: {
     GoogleMap,
-    InformationPanel
+    InformationPanel,
+    DetailCard
   },
   data() {
     return {
@@ -23,6 +26,8 @@ export default {
       filterPharmacy: [],
       isDevicePosition: false,
       redirectAddress: '',
+      makerID: '',
+      isOpen: false,
       addressInformtion: {
         city: '台北市',
         country: 'all',
@@ -36,6 +41,11 @@ export default {
   computed: {
     addressString () {
       return `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}${this.addressInformtion.address.trim()}`;
+    },
+    pharmacyNow () {
+      const now = this.filterPharmacy.find(item => item.properties.id === this.makerID);
+      if (now) return now.properties;
+      return null;
     }
   },
   methods: {
@@ -69,8 +79,13 @@ export default {
     onAddressFromLatLng(value) {
       this.redirectAddress = value;
     },
+    onTargetInforPharmacy(target) {
+      this.makerID = target.id;
+      this.onTargetPharmacy(target);
+    },
     onTargetPharmacy(target) {
-      console.log(target);
+      this.makerID = target.id;
+      this.isOpen = true;
     }
   }
 };

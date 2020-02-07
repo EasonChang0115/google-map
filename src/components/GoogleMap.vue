@@ -6,6 +6,9 @@
 import mapStyle from '@/assets/mapStyle.json';
 export default {
   props: {
+    makerID: {
+      type: String || Number
+    },
     address: {
       type: String
     },
@@ -39,6 +42,19 @@ export default {
     this.moveToLocationByAddress(this.address);
   },
   watch: {
+    makerID: {
+      immediate: false,
+      handler: function(value) {
+        const targetMaker = this.makers.find(maker => maker.data.id === value);
+        if (targetMaker) {
+          console.log(targetMaker);
+          if (this.currentInfoWindow) this.currentInfoWindow.close();
+          targetMaker.infowindow.open(this.map, targetMaker);
+          this.currentInfoWindow = targetMaker.infowindow;
+          this.map.panTo(targetMaker.position);
+        }
+      }
+    },
     isDevicePosition: {
       immediate: true,
       handler: function(value) {
@@ -148,10 +164,13 @@ export default {
       // 透過 InfoWindow 物件建構子建立新訊息視窗
       const infowindow = new window.google.maps.InfoWindow({
         // 設定想要顯示的內容
-        content: `${marker.data.name}`,
+        content: `<span style="font-size: 22px;font-weight: bold;font-family: 'Avenir', '微軟正黑體', Helvetica, Arial, sans-serif;">
+                    ${marker.data.name}
+                  <span>`,
         // 設定訊息視窗最大寬度
         maxWidth: 200
       });
+      marker.infowindow = infowindow;
       // 在地標上監聽點擊事件
       marker.addListener('click', () => {
         // 指定在哪個地圖和地標上開啟訊息視窗
