@@ -1,112 +1,104 @@
 <template>
-  <div id="app" class="container-fluid">
-    <div class="row">
-      <InformationPanel @onChangePharmacy="onChangePharmacy" :pharmacy="filterPharmacy" @onIsDevice="onChangeIsDevicePosition" :redirectAddress="redirectAddress"
-       @targetPhamercy="onTargetInforPharmacy" />
-      <!-- <GoogleMap :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID"/> -->
-      <VueLeaflet :pharmacy="filterPharmacy" :address="addressString" :isDevicePosition="isDevicePosition" @onAddress="onAddressFromLatLng" @targetPhamercy="onTargetPharmacy" :makerID="makerID" />
-    </div>
-    <DetailCard :phamarcy="pharmacyNow" :isOpen="isOpen" :closefunc="() => { isOpen = false; }"/>
-   </div>
+  <div id="app">
+    <!-- <Loading :active.sync="isLoading"></Loading> -->
+    <Loader :loading="isLoading" />
+    <SideMenu v-if="maskData !== null" :data="maskData" @update-show="updateShow" />
+    <MapLayer
+      id="map"
+      v-if="maskData !== null"
+      :data="maskData"
+      :show.sync="show"
+      :selected.sync="selected"
+      @update-selected="updateSelected"
+    />
+    <ShowBox :selected.sync="selected" />
+  </div>
 </template>
 
 <script>
-// import GoogleMap from './components/GoogleMap.vue';
-import VueLeaflet from './components/VueLeaflet.vue';
-import InformationPanel from './components/InformationPanel.vue';
-import DetailCard from './components/DetailCard.vue';
+// Import component
+import MapLayer from "./components/MapLayer.vue";
+import ShowBox from "./components/ShowBox.vue";
+import SideMenu from "./components/SideMenu.vue";
+import Loader from "./components/Loader.vue";
 
 export default {
-  components: {
-    // GoogleMap,
-    VueLeaflet,
-    InformationPanel,
-    DetailCard
-  },
+  name: "App",
   data() {
     return {
-      pharmacy: [],
-      filterPharmacy: [],
-      isDevicePosition: false,
-      redirectAddress: '',
-      makerID: '',
-      isOpen: false,
-      addressInformtion: {
-        city: '台北市',
-        country: 'all',
-        address: ''
-      }
+      isLoading: false,
+      maskData: null,
+      selected: null,
+      show: null,
+      showInfo: false,
+      api: process.env.VUE_APP_MASK_API
     };
   },
-  mounted() {
-    this.getStoreGeoPosition();
+  components: {
+    // Loading,
+    MapLayer,
+    ShowBox,
+    SideMenu,
+    Loader
   },
-  computed: {
-    addressString () {
-      return `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}${this.addressInformtion.address.trim()}`;
-    },
-    pharmacyNow () {
-      const now = this.filterPharmacy.find(item => item.properties.id === this.makerID);
-      if (now) return now.properties;
-      return null;
-    }
+  created() {
+    this.getMaskData();
   },
   methods: {
-    getStoreGeoPosition() {
-      const urlPath = 'https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json?fbclid=IwAR0b9mboKf0ib9sDhcj7WWFpT3LrWZ599j5fOMznNALGZrx8kggx6oNoYTc';
-      fetch(urlPath)
-        .then(results => results.json())
-        .then(result => {
-          // console.log(JSON.stringify(result));
-          const res = result.features;
-          this.pharmacy = res;
-          this.onChangePharmacy();
-      });
+    async getMaskData() {
+      this.isLoading = true;
+      const response = await this.axios.get(this.api);
+      console.log("Data Get!");
+      this.maskData = await Object.freeze(response.data.features);
+      this.isLoading = false;
     },
-    onChangePharmacy(addressInformtion) {
-      if (addressInformtion) this.addressInformtion = addressInformtion;
-      const filterPharmacyByAddress = this.pharmacy.filter((item) => item.properties.address.includes(this.addressString));
-      const filterPharmacyByName = this.pharmacy.filter((item) => item.properties.name === this.addressInformtion.address);
-      if (filterPharmacyByName.length > 0) {
-        this.filterPharmacy = filterPharmacyByName;
-      } else if (filterPharmacyByAddress.length === 0 && filterPharmacyByName.length === 0) {
-        const areaString = `${this.addressInformtion.city}${this.addressInformtion.country === 'all' ? '' : this.addressInformtion.country}`;
-        this.filterPharmacy = this.pharmacy.filter((item) => item.properties.address.includes(areaString));
-      } else {
-        this.filterPharmacy = filterPharmacyByAddress;
-      }
+    updateSelected(item) {
+      this.selected = item;
     },
-    onChangeIsDevicePosition(value) {
-      this.isDevicePosition = value;
-    },
-    onAddressFromLatLng(value) {
-      this.redirectAddress = value;
-    },
-    onTargetInforPharmacy(target) {
-      this.makerID = target.id;
-      this.onTargetPharmacy(target);
-    },
-    onTargetPharmacy(target) {
-      this.makerID = target.id;
-      this.isOpen = true;
+    updateShow(item) {
+      this.show = item;
+      this.selected = item;
     }
   }
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "@/assets/main.scss";
+html {
+  overflow: hidden;
+}
 * {
   box-sizing: border-box;
 }
-body, html, #app {
+html,
+body,
+#app {
   height: 100%;
-  width: 100%;
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+button {
+  outline: none;
 }
 #app {
-  font-family: 'Avenir', '微軟正黑體', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(250, 250, 250, 10);
+  font: 16px/19px Noto Sans TC;
+}
+#map {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
 }
 </style>
